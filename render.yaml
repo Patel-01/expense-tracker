@@ -1,21 +1,13 @@
 services:
+  # One service: the root Dockerfile builds the frontend and Express serves it alongside the API.
   - type: web
     name: todo-backend
     env: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
     envVars:
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
-      - key: CORS_ORIGIN
-        sync: false
-
-  - type: web
-    name: todo-frontend
-    env: docker
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
-    # Set VITE_API_URL as a Docker build argument in the Render dashboard
-    # (Settings > Build Arguments) to your backend's Render URL.

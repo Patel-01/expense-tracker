@@ -1,12 +1,13 @@
 # Interview Full Stack Starter
 
-Monorepo: Express + TypeScript backend, React (Vite) + TypeScript frontend, Supabase (Postgres) database. Each service has its own `Dockerfile` for deployment to Render (or AWS).
+Monorepo: Express + TypeScript backend, React (Vite) + TypeScript frontend, Supabase (Postgres) database. The root `Dockerfile` builds both into one image: Express serves the API under `/api` and the React app from the same origin, so it deploys as a single Render web service.
 
 ```
 .
 ├── backend/     Express API (TypeScript) -> Supabase
 ├── frontend/    React + Vite (TypeScript)
 ├── supabase/    migrations/ with the database schema
+├── Dockerfile   Builds frontend + backend into one service
 └── render.yaml  Render blueprint (optional)
 ```
 
@@ -25,12 +26,13 @@ npm install
 npm run dev             # http://localhost:3000
 ```
 
-Build/run with Docker instead:
+## Docker (single service)
+
+From the repo root:
 
 ```
-cd backend
-docker build -t todo-backend .
-docker run --env-file .env -p 3000:3000 todo-backend
+docker build -t todo-app .
+docker run --env-file backend/.env -p 3000:3000 todo-app   # app + API on http://localhost:3000
 ```
 
 ## 3. Frontend
@@ -42,30 +44,25 @@ npm install
 npm run dev             # http://localhost:5173
 ```
 
-Build/run with Docker instead (API URL is baked in at build time):
-
-```
-cd frontend
-docker build -t todo-frontend --build-arg VITE_API_URL=http://localhost:3000 .
-docker run -p 8080:80 todo-frontend
-```
+`backend/Dockerfile` and `frontend/Dockerfile` still exist if you'd rather deploy the two halves separately.
 
 ## 4. Deploy to Render
 
 Push this repo to GitHub, then in Render:
 
-- **New Web Service** → pick the repo → set **Root Directory** to `backend`, **Environment** to Docker. Add env vars `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CORS_ORIGIN` (your frontend's Render URL).
-- **New Web Service** → same repo → **Root Directory** `frontend`, **Environment** Docker. Add a Docker **Build Argument** `VITE_API_URL` set to the backend service's Render URL.
+- **New Web Service** → pick the repo → leave **Root Directory** empty, **Environment** Docker (uses the root `Dockerfile`), health check path `/health`. Add env vars `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
 - Or use the included `render.yaml` blueprint (New > Blueprint, point at this repo) and fill in the env vars it asks for.
 
-Render's free web services sleep after 15 minutes idle — open both URLs a few minutes before you need them.
+No `VITE_API_URL` or `CORS_ORIGIN` is needed: the frontend and API share one origin.
+
+Render's free web services sleep after 15 minutes idle — open the URL a few minutes before you need it.
 
 ## 5. Deploy to AWS (alternative)
 
-Both Dockerfiles are plain multi-stage builds with no Render-specific assumptions, so they also work on:
+The root Dockerfile is a plain multi-stage build with no Render-specific assumptions, so it also works on:
 
-- **AWS App Runner** — point it at the repo/Dockerfile per service, simplest option.
-- **Elastic Beanstalk (Docker platform)** — `eb init` / `eb create` per service using its Dockerfile.
-- **ECS Fargate** — push each image to ECR, run as a Fargate service behind an ALB.
+- **AWS App Runner** — point it at the repo/Dockerfile, simplest option.
+- **Elastic Beanstalk (Docker platform)** — `eb init` / `eb create` using the Dockerfile.
+- **ECS Fargate** — push the image to ECR, run as a Fargate service behind an ALB.
 
-Set the same env vars (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CORS_ORIGIN`, `VITE_API_URL`) through whichever service's environment/secrets config.
+Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` through whichever service's environment/secrets config.

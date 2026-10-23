@@ -5,7 +5,9 @@ export interface Todo {
   created_at: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+// Production builds are served by the backend, so default to the same origin
+const API_URL =
+  import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
