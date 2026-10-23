@@ -38,8 +38,14 @@ Backend imports use `NodeNext` resolution: relative imports need `.js` extension
 - `client/src/shared/`: `HttpClient` (transport only: same-origin relative URLs, JSON, turns `{error}` responses into thrown errors), the shared `Button` (variants map to `.button-<variant>` classes in `styles.css`), and global styles.
 - `client/src/modules/todos/`: `types/` (view types, `createdAt` as a string), `services/TodoApiClient` (endpoints and payloads), `pages/TodoListPage` (owns all state; optimistic toggle with rollback; `busyIds` disables rows while a request is in flight), and presentational `components/`.
 
+**Expenses module** (`src/modules/expenses`, `client/src/modules/expenses`) is the app's main UI; the todos module is still served under `/api/todos` but not rendered.
+- The routes are mounted at both `/expenses` (the path the spec names) and `/api/expenses` (used by the client).
+- `total_count` and `total_amount` come from the SQL function `expense_totals`, so they cover all matching rows. The `items` come from a separate ranged query.
+- "Today" (the default date and the no-future-dates rule) is computed from `APP_TIME_ZONE` and injected into `DefaultExpenseRequestPlanner`.
+- The client validator `ExpenseFormValidator` mirrors the server rules. Change both together.
+
 There are no shared types between server and client. When the schema changes, update the migration, `models/`, `domain/`, and `client/.../types/` together. Migrations in `supabase/migrations/` are applied manually (SQL editor or `supabase db push`).
 
 ## Environment and deployment
 
-`.env` at the root (loaded via `dotenv/config`) holds `PORT` (4000 locally; the Docker image uses 10000), `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. The server throws at startup if either Supabase variable is missing. `render.yaml` deploys the root `Dockerfile` as one service with health check `/healthz`.
+`.env` at the root (loaded via `dotenv/config`) holds `PORT` (4000 locally; the Docker image uses 10000), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and optional `APP_TIME_ZONE` (default UTC). The server throws at startup if either Supabase variable is missing. `render.yaml` deploys the root `Dockerfile` as one service with health check `/healthz`.

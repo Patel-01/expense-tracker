@@ -6,7 +6,7 @@
     "dev": "concurrently -k \"tsx watch src/server.ts\" \"vite --config vite.config.ts\"",
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.server.json && tsc -p tsconfig.client.json && vite build --config vite.config.ts",
-    "test": "tsc -p tsconfig.test.json && node --test dist-test/modules/todos/services/TodoMutationPolicy.test.js dist-test/modules/todos/controllers/TodoController.test.js",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/modules/todos/services/TodoMutationPolicy.test.js dist-test/modules/todos/controllers/TodoController.test.js dist-test/modules/expenses/services/ExpenseRequestPolicy.test.js",
     "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.client.json"
   },
   "dependencies": {

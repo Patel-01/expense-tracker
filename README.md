@@ -14,7 +14,9 @@ shared `HttpClient` handles only transport concerns.
 
 ## Supabase setup
 1. Create a project at supabase.com.
-2. Run `supabase/migrations/20261023000000_init.sql` in the SQL editor (or `supabase link` + `supabase db push`).
+2. Run each file in `supabase/migrations/` in order in the SQL editor (or `supabase link` + `supabase db push`).
+   `20261023120000_expenses.sql` creates the `expenses` table plus the `expense_totals` and `expense_summary`
+   functions the API uses for totals.
 3. Copy the Project URL and `service_role` key from Project Settings > API.
 
 The backend uses the `service_role` key, which bypasses row-level security. It must stay on the
@@ -45,4 +47,12 @@ The `Dockerfile` has no Render-specific assumptions:
 
 Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` through the service's environment or secrets config.
 
-Endpoints: `GET /api/todos`, `POST /api/todos`, `PATCH /api/todos/:id`, `DELETE /api/todos/:id`, and `GET /healthz`.
+## Expense API
+Mounted at both `/expenses` and `/api/expenses`. Errors are `{ "error": "message" }` (400 for bad input).
+
+- `POST /expenses`: `{ title, amount, category, date? }`. The title is required (100 characters max). `amount` is a number > 0 with at most 2 decimals. `category` is one of `food`, `travel`, `bills`, `other`. `date` is `YYYY-MM-DD`, can't be in the future, and defaults to today in `APP_TIME_ZONE` (default `UTC`).
+- `GET /expenses?category=&from=&to=&page=&limit=`: newest first. `limit` defaults to 10 (max 100). Returns `{ items, total_count, total_amount }`; the totals cover all matching expenses, not just the page.
+- `DELETE /expenses/:id`: 204, or 404 if it doesn't exist.
+- `GET /expenses/summary?month=YYYY-MM`: `{ month, totals: { food, travel, bills, other } }`.
+
+Other endpoints: `GET /api/todos`, `POST /api/todos`, `PATCH /api/todos/:id`, `DELETE /api/todos/:id`, and `GET /healthz`.

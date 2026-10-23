@@ -1,10 +1,10 @@
 import React from 'react';
-import TodoListPage from '../modules/todos/pages/TodoListPage.js';
+import ExpensesPage from '../modules/expenses/pages/ExpensesPage.js';
 import '../shared/styles.css';
 
 /** Application composition point for cross-feature providers and routing. */
-export default class TodoApp extends React.Component {
+export default class App extends React.Component {
   render(): React.ReactNode {
-    return <TodoListPage />;
+    return <ExpensesPage />;
   }
 }

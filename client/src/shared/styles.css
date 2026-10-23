@@ -120,6 +120,22 @@ button {
   cursor: pointer;
 }
 
+/* Base button; the variants below override it, so it must come first */
+.button {
+  padding: 0.375rem 0.75rem;
+  border: 2px solid var(--rule);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--graphite);
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.button:disabled {
+  color: var(--faded);
+  cursor: default;
+}
+
 .button-primary {
   padding: 0.375rem 0.875rem;
   border: 2px solid var(--ink);
@@ -300,5 +316,201 @@ button {
   .label-text,
   .task input[type="checkbox"]::after {
     transition: none;
+  }
+}
+
+/* ---- Expenses ---- */
+
+.tally strong {
+  color: var(--graphite);
+  font-weight: 800;
+}
+
+.expense-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 1.25rem;
+  padding: 0.75rem 0 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  padding-top: 0.75rem;
+}
+
+.field-title {
+  grid-column: 1 / -1;
+}
+
+.field label,
+.filter-bar label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--faded);
+}
+
+.hint {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--faded);
+}
+
+.field input,
+.field select,
+.filter-bar select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0 0.125rem;
+  border: 0;
+  border-bottom: 2px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 1.0625rem;
+  color: inherit;
+}
+
+.field select,
+.filter-bar select {
+  text-transform: capitalize;
+}
+
+.field input:focus,
+.field select:focus,
+.filter-bar select:focus {
+  outline: none;
+  border-bottom-color: var(--ink);
+}
+
+.field [aria-invalid="true"] {
+  border-bottom-color: var(--margin);
+}
+
+.field-error {
+  font-size: 0.875rem;
+  color: var(--margin);
+}
+
+.form-error {
+  grid-column: 1 / -1;
+  margin-top: 0.75rem;
+  border-bottom: 0;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  padding-top: 1rem;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: var(--line);
+  border-bottom: 1px solid var(--rule);
+}
+
+.filter-bar select {
+  width: auto;
+  min-width: 12rem;
+  border-bottom: 0;
+}
+
+.expense-results[aria-busy="true"] {
+  opacity: 0.55;
+}
+
+.expense {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto auto;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.expense[aria-busy="true"] {
+  opacity: 0.55;
+}
+
+.expense-date {
+  font-size: 0.875rem;
+  color: var(--faded);
+  white-space: nowrap;
+}
+
+.expense-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.0625rem;
+  overflow-wrap: anywhere;
+}
+
+.expense-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.expense-actions {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 4.5rem;
+}
+
+.confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  font-size: 0.9375rem;
+  color: var(--margin);
+  white-space: nowrap;
+}
+
+.tag {
+  padding: 0 0.375rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--faded);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--line);
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--faded);
+  font-size: 0.9375rem;
+}
+
+.note .button {
+  flex: none;
+}
+
+@media (max-width: 30rem) {
+  .expense-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .expense {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .expense-date {
+    grid-column: 1 / -1;
   }
 }
