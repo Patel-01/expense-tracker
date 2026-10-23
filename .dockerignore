@@ -1,5 +1,9 @@
-**/node_modules
-**/dist
-**/.env
+node_modules
+npm-debug.log
+.env
 .git
+.gitignore
+client/dist
+README.md
+dist-test
 supabase

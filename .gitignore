@@ -1,5 +1,7 @@
 node_modules/
-dist/
 .env
+dist/
+client/dist/
+dist-test/
 *.local
 supabase/.temp/

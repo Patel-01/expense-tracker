@@ -1,12 +1,12 @@
 services:
-  # One service: the root Dockerfile builds the frontend and Express serves it alongside the API.
   - type: web
-    name: todo-backend
-    env: docker
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    healthCheckPath: /health
+    name: interview-fullstack-starter
+    runtime: docker
+    plan: free
+    healthCheckPath: /healthz
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
