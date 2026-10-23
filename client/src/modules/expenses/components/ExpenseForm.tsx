@@ -22,6 +22,7 @@ export default class ExpenseForm extends React.Component<ExpenseFormProps, Expen
   state: ExpenseFormState = { values: emptyForm, errors: {}, attempted: false, saving: false };
 
   private readonly validator = new ExpenseFormValidator();
+  private readonly titleInput = React.createRef<HTMLInputElement>();
 
   private change(field: keyof ExpenseFormValues, value: string): void {
     this.setState(state => {
@@ -42,61 +43,77 @@ export default class ExpenseForm extends React.Component<ExpenseFormProps, Expen
     try {
       await this.props.onSubmit(this.validator.toInput(this.state.values));
       this.setState({ values: emptyForm, errors: {}, attempted: false });
+      // Ready for the next entry
+      this.titleInput.current?.focus();
     } catch (error) {
-      this.setState({ serverError: error instanceof Error ? error.message : "Couldn't save the expense." });
+      this.setState({ serverError: error instanceof Error ? error.message : "The expense wasn't saved. Try again." });
     } finally {
       this.setState({ saving: false });
     }
   };
 
-  private fieldProps(field: keyof ExpenseFormValues) {
+  private described(field: keyof ExpenseFormValues) {
     const error = this.state.errors[field];
-    return {
-      id: `expense-${field}`,
-      value: this.state.values[field],
-      'aria-invalid': Boolean(error),
-      'aria-describedby': error ? `expense-${field}-error` : undefined
-    };
+    return { 'aria-invalid': Boolean(error), 'aria-describedby': error ? `xp-${field}-error` : undefined };
   }
 
   private error(field: keyof ExpenseFormValues): React.ReactNode {
     const error = this.state.errors[field];
-    return error && <span className="field-error" id={`expense-${field}-error`}>{error}</span>;
+    return error && <span className="xp-field-error" id={`xp-${field}-error`}>{error}</span>;
   }
 
   render(): React.ReactNode {
-    const { saving, serverError } = this.state;
-    return <form className="expense-form" onSubmit={event => void this.submit(event)} noValidate>
-      <div className="field field-title">
-        <label htmlFor="expense-title">Title</label>
-        <input {...this.fieldProps('title')} maxLength={200} autoComplete="off" placeholder="e.g. Train to Pune"
-          onChange={event => this.change('title', event.currentTarget.value)} />
-        {this.error('title')}
-      </div>
-      <div className="field">
-        <label htmlFor="expense-amount">Amount</label>
-        <input {...this.fieldProps('amount')} inputMode="decimal" autoComplete="off" placeholder="0.00"
-          onChange={event => this.change('amount', event.currentTarget.value)} />
-        {this.error('amount')}
-      </div>
-      <div className="field">
-        <label htmlFor="expense-category">Category</label>
-        <select {...this.fieldProps('category')} onChange={event => this.change('category', event.currentTarget.value)}>
-          <option value="" disabled>Choose…</option>
-          {EXPENSE_CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}
-        </select>
-        {this.error('category')}
-      </div>
-      <div className="field">
-        <label htmlFor="expense-date">Date <span className="hint">(optional, defaults to today)</span></label>
-        <input {...this.fieldProps('date')} type="date" max={localToday()}
-          onChange={event => this.change('date', event.currentTarget.value)} />
-        {this.error('date')}
-      </div>
-      {serverError && <p className="note error form-error" role="alert">{serverError}</p>}
-      <div className="form-actions">
-        <Button variant="primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Add expense'}</Button>
-      </div>
-    </form>;
+    const { values, errors, saving, serverError } = this.state;
+    return <section className="xp-add" aria-labelledby="xp-add-title">
+      <h2 id="xp-add-title">Add an expense</h2>
+      <form className="xp-form" onSubmit={event => void this.submit(event)} noValidate>
+        <div className="xp-field xp-field-wide">
+          <label htmlFor="xp-title-input">What was it for?</label>
+          <div className="xp-input" data-invalid={Boolean(errors.title)}>
+            <input id="xp-title-input" ref={this.titleInput} value={values.title} autoComplete="off"
+              placeholder="Train to Pune" {...this.described('title')}
+              onChange={event => this.change('title', event.currentTarget.value)} />
+          </div>
+          {this.error('title')}
+        </div>
+
+        <div className="xp-field">
+          <label htmlFor="xp-amount-input">Amount</label>
+          <div className="xp-input" data-invalid={Boolean(errors.amount)}>
+            <span className="xp-currency" aria-hidden="true">₹</span>
+            <input id="xp-amount-input" value={values.amount} inputMode="decimal" autoComplete="off"
+              placeholder="450.00" {...this.described('amount')}
+              onChange={event => this.change('amount', event.currentTarget.value)} />
+          </div>
+          {this.error('amount')}
+        </div>
+
+        <div className="xp-field">
+          <label htmlFor="xp-date-input">Date <span className="xp-optional">(leave blank for today)</span></label>
+          <div className="xp-input" data-invalid={Boolean(errors.date)}>
+            <input id="xp-date-input" type="date" value={values.date} max={localToday()} {...this.described('date')}
+              onChange={event => this.change('date', event.currentTarget.value)} />
+          </div>
+          {this.error('date')}
+        </div>
+
+        <fieldset className="xp-field xp-field-category" {...this.described('category')}>
+          <legend>Category</legend>
+          <div className="xp-chips">
+            {EXPENSE_CATEGORIES.map(category => <label key={category} className="xp-chip" data-category={category}>
+              <input type="radio" name="category" value={category} checked={values.category === category}
+                onChange={() => this.change('category', category)} />
+              <span>{category}</span>
+            </label>)}
+          </div>
+          {this.error('category')}
+        </fieldset>
+
+        <div className="xp-form-footer">
+          <Button variant="primary" type="submit" disabled={saving}>{saving ? 'Adding…' : 'Add expense'}</Button>
+          {serverError && <p className="xp-server-error" role="alert">{serverError}</p>}
+        </div>
+      </form>
+    </section>;
   }
 }

@@ -31,3 +31,10 @@ export interface ExpenseFormValues {
 }
 
 export type ExpenseFormErrors = Partial<Record<keyof ExpenseFormValues, string>>;
+
+export type CategoryTotals = Record<ExpenseCategory, number>;
+
+export interface MonthSummaryView {
+  month: string;
+  totals: CategoryTotals;
+}

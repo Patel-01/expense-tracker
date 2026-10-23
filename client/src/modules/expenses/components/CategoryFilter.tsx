@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../../../shared/components/Button.js';
 import { EXPENSE_CATEGORIES, type ExpenseCategory } from '../types/Expense.js';
 
 interface CategoryFilterProps {
@@ -8,13 +9,12 @@ interface CategoryFilterProps {
 
 export default class CategoryFilter extends React.Component<CategoryFilterProps> {
   render(): React.ReactNode {
-    return <div className="filter-bar">
-      <label htmlFor="category-filter">Show</label>
-      <select id="category-filter" value={this.props.value}
-        onChange={event => this.props.onChange(event.currentTarget.value as ExpenseCategory | '')}>
-        <option value="">All categories</option>
-        {EXPENSE_CATEGORIES.map(category => <option key={category} value={category}>{category}</option>)}
-      </select>
+    const { value, onChange } = this.props;
+    const options: (ExpenseCategory | '')[] = ['', ...EXPENSE_CATEGORIES];
+    return <div className="xp-filter" role="group" aria-label="Filter by category">
+      {options.map(option => <Button key={option || 'all'} aria-pressed={value === option} onClick={() => onChange(option)}>
+        {option || 'All'}
+      </Button>)}
     </div>;
   }
 }
