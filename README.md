@@ -1,16 +1,24 @@
-# Interview Full Stack Starter
+# Expense Tracker
 
-A todo app written in TypeScript: Express API, React (Vite) client, Supabase (Postgres) database.
-The backend is organized by business capability: `src/modules/todos` owns the todo domain,
-its persistence port and Supabase repository, request validation, and the HTTP controller.
+**Live app:** https://interview-fullstack-starter.onrender.com
+(API: [`/expenses`](https://interview-fullstack-starter.onrender.com/expenses), health check:
+[`/healthz`](https://interview-fullstack-starter.onrender.com/healthz). It's on Render's free plan,
+which sleeps after 15 idle minutes, so the first request can take about a minute.)
+
+Log expenses, filter them by category, and see what each month cost, split by food, travel, bills
+and other. Written in TypeScript: Express API, React (Vite) client, Supabase (Postgres) database.
+
+The backend is organized by business capability. `src/modules/expenses` owns the expense domain,
+its persistence port and Supabase repository, request validation and the HTTP controller.
+`src/modules/todos` is the starter boilerplate that came before it, and follows the same structure.
 `ApplicationContainer` is the composition root that creates the Supabase client and wires the
-module together; nothing outside it constructs concrete adapters.
+modules together; nothing outside it constructs concrete adapters.
 
 The frontend keeps application-wide composition and shared infrastructure in `client/src/app`
-and `client/src/shared`, while todo-owned code lives together under `client/src/modules/todos`.
-The class-based `TodoListPage` owns the list state and composes focused class components for
-the header, compose form, list, and rows. `TodoApiClient` owns todo endpoints and payloads; the
-shared `HttpClient` handles only transport concerns.
+and `client/src/shared`, while expense code lives together under `client/src/modules/expenses`.
+The class-based `ExpensesPage` owns the page state and composes focused class components for the
+month overview, add form, category filter, entry list and pager. `ExpenseApiClient` owns the
+expense endpoints and payloads, and the shared `HttpClient` handles only transport concerns.
 
 ## Supabase setup
 1. Create a project at supabase.com.
