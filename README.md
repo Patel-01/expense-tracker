@@ -6,14 +6,14 @@ Monorepo: Express + TypeScript backend, React (Vite) + TypeScript frontend, Supa
 .
 ├── backend/     Express API (TypeScript) -> Supabase
 ├── frontend/    React + Vite (TypeScript)
-├── supabase/    schema.sql to run in the Supabase SQL editor
+├── supabase/    migrations/ with the database schema
 └── render.yaml  Render blueprint (optional)
 ```
 
 ## 1. Supabase setup
 
 1. Create a project at supabase.com.
-2. Open the SQL editor and run `supabase/schema.sql`.
+2. Open the SQL editor and run `supabase/migrations/20261023000000_init.sql` (or `supabase link` + `supabase db push` with the CLI).
 3. Grab your Project URL and `service_role` key from Project Settings > API.
 
 ## 2. Backend
